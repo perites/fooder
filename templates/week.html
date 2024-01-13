@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Week</title>
+</head>
+<body>
+{% for day in week.week %}
+    <h1>{{ day.date }}</h1>
+    <h2>Lunch:</h2>
+    {% for dish in day.menu_for_lunch %}
+        <h3>{{ dish.dish_name_obj.name }}</h3>
+
+        {% for pare in dish.ingredients_objs %}
+            {{ pare.ingr.name }} --- {{ pare.ingr_amount }}
+            <br>
+
+        {% endfor %}
+    {% endfor %}
+
+    <h2>Dinner:</h2>
+    {% for dish in day.menu_for_dinner %}
+        <h3>{{ dish.dish_name_obj.name }}</h3>
+        {% for pare in dish.ingredients_objs %}
+            {{ pare.ingr.name }} --- {{ pare.ingr_amount }}
+            <br>
+
+        {% endfor %}
+    {% endfor %}
+{% endfor %}
+</body>
+</html>
