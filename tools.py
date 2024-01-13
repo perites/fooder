@@ -1,3 +1,4 @@
+import logging
 import datetime
 from collections import Counter
 
@@ -13,6 +14,34 @@ class Day:
                                 list(
                                     DateDish.select().where(
                                         (DateDish.date == self.date) & (DateDish.type == "dinner")))]
+
+        self.weekday = self.date.isocalendar()[2]
+
+    def update_menu(self, action: str, dish_name: str):
+        dish = DishName.get(DishName.name == dish_name)
+
+        match action:
+            case "dish_lunch":
+                logging.info(f"add dish {dish} to lunch to day at date {self.date}")
+
+                DateDish.create(date=self.date, type="lunch", dish=dish)
+            case "dish_dinner":
+                logging.info(f"add dish {dish} to dinner to day at date {self.date}")
+
+                DateDish.create(date=self.date, type="dinner", dish=dish)
+            case "dish_lunch_delete":
+                logging.info(f"delete dish {dish} from lunch to day at date {self.date}")
+
+                qry = DateDish.delete().where(
+                    (DateDish.date == self.date) & (DateDish.type == "lunch") & (DateDish.dish == dish))
+                qry.execute()
+
+            case "dish_dinner_delete":
+                logging.info(f"delete dish {dish} from dinner to day at date {self.date}")
+
+                qry = DateDish.delete().where(
+                    (DateDish.date == self.date) & (DateDish.type == "dinner") & (DateDish.dish == dish))
+                qry.execute()
 
     def ingredients_list(self):
         ingredient_list = []
@@ -50,6 +79,7 @@ class Week:
 class Dish:
     def __init__(self, dish_name_obj: DishName):
         self.dish_name_obj = dish_name_obj
+        self.name = self.dish_name_obj.name
         self.ingredients_objs = self.dish_name_obj.ingredients
 
 # dish1 = Dish("Dish1")

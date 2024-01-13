@@ -5,3 +5,6 @@ places_where_to_buy = (
 )
 
 date_format = "%Y-%m-%d"
+
+username = "admin"
+password = "password"

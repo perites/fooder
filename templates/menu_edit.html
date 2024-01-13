@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Edit week</title>
+</head>
+<body>
+
+<h1>from : {{ week.week[0].date }} till : {{ week.week[-1].date }}</h1>
+
+{% for day in week.week %}
+
+
+    <h3>{{ day.weekday }}</h3>
+    <p>lunch :  {% for dish in day.menu_for_lunch %}
+        <a href="/dish/{{ dish.name }}">{{ dish.name }}</a>,
+    {% endfor %}
+    </p>
+
+    <form action="/week/{{ day.date }}/edit/" method="POST">
+        <select name="dish_lunch">
+            {% for dish in dishes %}
+                <option value="{{ dish.name }}">{{ dish.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Записати</button>
+    </form>
+
+    <form action="/week/{{ day.date }}/edit/" method="POST">
+        <select name="dish_lunch_delete">
+            {% for dish in day.menu_for_lunch %}
+                <option value="{{ dish.name }}">{{ dish.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Видалити</button>
+    </form>
+
+
+    <p>dinner :  {% for dish in day.menu_for_dinner %}
+        <a href="/dish/{{ dish.name }}">{{ dish.name }}</a>,
+    {% endfor %}
+    </p>
+
+    <form action="/week/{{ day.date }}/edit/" method="POST">
+        <select name="dish_dinner">
+            {% for dish in dishes %}
+                <option value="{{ dish.name }}">{{ dish.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Записати</button>
+    </form>
+
+    <form action="/week/{{ day.date }}/edit/" method="POST">
+        <select name="dish_dinner_delete">
+            {% for dish in day.menu_for_dinner %}
+                <option value="{{ dish.name }}">{{ dish.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Видалити</button>
+    </form>
+
+
+{% endfor %}
+
+<form action="/week/{{ week.week[0].date }}" method="GET">
+    <button>See menu</button>
+</form>
+
+</body>
+</html>
