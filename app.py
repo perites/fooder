@@ -4,8 +4,8 @@ import logging
 from flask import Flask, redirect, render_template, request
 from flask_login import login_required, UserMixin, LoginManager, login_user
 
-from tools import Day, Week, Dish, DishName
-from decorators import error_catcher
+from tools import Day, Week, Dish, DishName, Ingredient
+from decorators import error_catcher, if_exists_dish
 import confg
 
 app = Flask(__name__)
@@ -106,6 +106,47 @@ def menu_edit_post(date):
     day.update_menu(action, form[action])
 
     return redirect(f"/week/{date}/edit")
+
+
+@app.route("/dish/<dish_name>/")
+@error_catcher
+@if_exists_dish
+def show_dish(dish):
+    return render_template("dish.html", dish=dish)
+
+
+@app.route("/dish/<dish_name>/edit", methods=["GET"])
+@error_catcher
+@login_required
+@if_exists_dish
+def dish_edit_get(dish):
+    return render_template("dish_edit.html", dish=dish, all_ingredients=Ingredient.select())
+
+
+@app.route("/dish/<dish_name>/edit", methods=["POST"])
+@error_catcher
+@login_required
+def dish_edit_post(dish_name):
+    form = request.form.to_dict()
+    if not form:
+        return redirect(f"/dish/{dish_name}/edit")
+
+    dish = Dish(DishName.get(DishName.name == dish_name))
+    dish.update(form)
+    return redirect(f"/dish/{dish.name}/edit")
+
+
+@app.route("/dish/add", methods=["GET", "POST"])
+@error_catcher
+@login_required
+def dish_add():
+    if request.method == "GET":
+        return render_template("dish_add.html")
+
+    form = request.form.to_dict()
+    new_dish_name = form["new_dish_name"]
+    DishName.create(name=new_dish_name)
+    return redirect(f"/dish/{new_dish_name}/edit")
 
 
 if __name__ == '__main__':

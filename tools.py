@@ -82,6 +82,47 @@ class Dish:
         self.name = self.dish_name_obj.name
         self.ingredients_objs = self.dish_name_obj.ingredients
 
+    def update(self, form):
+        action = form["action"]
+        match action:
+            case "delete_dish":
+                qry = DishName.delete().where(DishName.name == self.name)
+                qry.execute()
+                qry = IngrToDish.delete().where(IngrToDish.dish == self.dish_name_obj)
+                qry.execute()
+                qry = DateDish.delete().where(DateDish.dish == self.dish_name_obj)
+                qry.execute()
+                logging.info(f"delete dish named {self.name}")
+
+            case "change_name":
+                self.dish_name_obj.name = form['new_name']
+                try:
+                    self.dish_name_obj.save()
+                except Exception as e:
+                    pass
+
+                logging.info(f'change name for dish {self.name} to {form["new_name"]}')
+                self.name = self.dish_name_obj.name
+
+            case "delete_ingr":
+                qry = IngrToDish.delete().where((IngrToDish.dish == self.dish_name_obj) & (
+                        IngrToDish.ingr == Ingredient.get(Ingredient.name == form["ingr_to_delete"])))
+                qry.execute()
+                logging.info(f"delete ingr named {form['ingr_to_delete']} from dish {self.name}")
+
+            case "change_ingr_amount":
+                pare = list(IngrToDish.select().where((IngrToDish.dish == self.dish_name_obj) & (
+                        IngrToDish.ingr == Ingredient.get(Ingredient.name == form["ingr_to_change"]))))[0]
+                pare.ingr_amount = form["new_amount"]
+                pare.save()
+                logging.info(
+                    f'change amount of ingr {form["ingr_to_change"]} to {form["new_amount"]} in dish {self.name}')
+
+            case "add_ingr":
+                IngrToDish.create(dish=self.dish_name_obj, ingr=Ingredient.get(Ingredient.name == form["ingr_to_add"]),
+                                  ingr_amount=form["amount"])
+                logging.info(f'add ingr {form["ingr_to_add"]} with amount {form["amount"]} to dish {self.name}')
+
 # dish1 = Dish("Dish1")
 # print(dish1.dish_name_obj.name)
 # for ing in dish1.ingredients_objs:

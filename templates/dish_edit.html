@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Edit dish</title>
+</head>
+<body>
+
+<h1>{{ dish.name }}</h1>
+<form action="/dish/{{ dish.name }}/edit" method="POST">
+    <input type="hidden" name="action" value="change_name">
+    <input name="new_name" required>
+    <button type="submit">Змінити назву</button>
+</form>
+<form action="/dish/{{ dish.name }}/edit" method="POST">
+    <input type="hidden" name="action" value="delete_dish">
+    <button type="submit">Видалити блюдо</button>
+</form>
+
+{% for pare in dish.ingredients_objs %}
+
+    <h3>{{ pare.ingr.name }} : {{ pare.ingr_amount }}</h3>
+    <form action="/dish/{{ dish.name }}/edit" method="POST">
+        <input type="hidden" name="action" value="delete_ingr">
+        <input type="hidden" name="ingr_to_delete" value="{{ pare.ingr.name }}">
+        <button type="submit">Видалити</button>
+    </form>
+
+    <form action="/dish/{{ dish.name }}/edit" method="POST">
+        <input type="hidden" name="action"
+               value="change_ingr_amount">
+        <input type="hidden" name="ingr_to_change" value="{{ pare.ingr.name }}">
+        <input name="new_amount" required>
+        <button type="submit">Записати</button>
+    </form>
+
+{% endfor %}
+
+
+<br>
+<form action="/dish/{{ dish.name }}/edit" method="POST">
+    <select name="ingr_to_add">
+        {% for ingr in all_ingredients %}
+            <option value="{{ ingr.name }}">{{ ingr.name }}</option>
+        {% endfor %}
+    </select>
+    <input name="amount" required>
+    <input type="hidden" name="action" value="add_ingr">
+    <button type="submit">Додати</button>
+</form>
+
+<br>
+<form action="/">
+    <button>На сьогодні</button>
+</form>
+
+
+</body>
+</html>
