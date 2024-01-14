@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Edit ingredients</title>
+</head>
+<body>
+
+<form action="/ingredients/edit" method="POST">
+    <input type="hidden" name="action" value="add_new_ingr">
+    <input name="ingr_name" required>
+    <select name="where_to_buy" required>
+        {% for place in where_to_buy %}
+            <option value="{{ place[0] }}">{{ place[1] }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Додати інгредіент</button>
+</form>
+
+
+
+
+{% for ingr in ingrs %}
+    <h3>{{ ingr.name }} купувати в {{ ingr.where_to_buy }}</h3>
+    <form action="/ingredients/edit" method="POST">
+        <input type="hidden" name="action" value="change_name">
+        <input type="hidden" name="ingr_name" value="{{ ingr.name }}">
+        <input name="new_name" required>
+        <button type="submit">Змінити назву</button>
+    </form>
+    <form action="/ingredients/edit" method="POST">
+        <input type="hidden" name="action" value="change_place">
+        <input type="hidden" name="ingr_name" value="{{ ingr.name }}">
+        <select name="where_to_buy" required>
+            {% for place in where_to_buy %}
+                <option value="{{ place[0] }}">{{ place[1] }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Змінити де купувати</button>
+    </form>
+    <form action="/ingredients/edit" method="POST">
+        <input type="hidden" name="action" value="delete">
+        <input type="hidden" name="ingr_name" value="{{ ingr.name }}">
+        <button type="submit">Видалити</button>
+    </form>
+
+
+
+{% endfor %}
+
+
+</body>
+</html>

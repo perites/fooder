@@ -86,12 +86,13 @@ class Dish:
         action = form["action"]
         match action:
             case "delete_dish":
-                qry = DishName.delete().where(DishName.name == self.name)
-                qry.execute()
                 qry = IngrToDish.delete().where(IngrToDish.dish == self.dish_name_obj)
                 qry.execute()
                 qry = DateDish.delete().where(DateDish.dish == self.dish_name_obj)
                 qry.execute()
+                qry = DishName.delete().where(DishName.name == self.name)
+                qry.execute()
+
                 logging.info(f"delete dish named {self.name}")
 
             case "change_name":
@@ -123,21 +124,37 @@ class Dish:
                                   ingr_amount=form["amount"])
                 logging.info(f'add ingr {form["ingr_to_add"]} with amount {form["amount"]} to dish {self.name}')
 
-# dish1 = Dish("Dish1")
-# print(dish1.dish_name_obj.name)
-# for ing in dish1.ingredients_objs:
-#     print(ing.ingr.name)
-#     print(ing.ingr_amount)
 
-# day1 = Day(datetime.date.today())
-# print("Lunch : ")
-# for dish in day1.menu_for_lunch:
-#     print(dish.dish_name_obj.name)
-#     for pare in dish.ingredients_objs:
-#         print(pare.ingr.name, "---", pare.ingr_amount)
-#
-# print("Dinner : ")
-# for dish in day1.menu_for_dinner:
-#     print(dish.dish_name_obj.name)
-#     for pare in dish.ingredients_objs:
-#         print(pare.ingr.name, "---", pare.ingr_amount)
+def change_ingr(form: dict):
+    ingr_name = form.get('ingr_name')
+    ingr_place = form.get('where_to_buy')
+    action = form['action']
+
+    if action == "add_new_ingr":
+        Ingredient.create(name=ingr_name, where_to_buy=ingr_place)
+        logging.info(f"add new ingr with name : {ingr_name} place : {ingr_place}")
+        return
+
+    ingr = Ingredient.get(Ingredient.name == ingr_name)
+
+    match action:
+        case "change_name":
+            new_name = form['new_name']
+
+            ingr.name = new_name
+            ingr.save()
+            logging.info(f"change name ingr {ingr_name} to {new_name}")
+
+        case "change_place":
+            ingr.where_to_buy = ingr_place
+            ingr.save()
+            logging.info(f"change place for ingredient {ingr_name} to place {ingr_place}")
+
+        case "delete":
+            qry = IngrToDish.delete().where(IngrToDish.ingr == ingr)
+            qry.execute()
+
+            ingr.delete_instance()
+            logging.info(f"delete ingr with name {ingr_name}")
+
+    return

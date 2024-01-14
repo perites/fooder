@@ -4,7 +4,7 @@ import logging
 from flask import Flask, redirect, render_template, request
 from flask_login import login_required, UserMixin, LoginManager, login_user
 
-from tools import Day, Week, Dish, DishName, Ingredient
+from tools import Day, Week, Dish, DishName, Ingredient, change_ingr
 from decorators import error_catcher, if_exists_dish
 import confg
 
@@ -115,6 +115,19 @@ def show_dish(dish):
     return render_template("dish.html", dish=dish)
 
 
+@app.route("/dish/add", methods=["GET", "POST"])
+@error_catcher
+@login_required
+def dish_add():
+    if request.method == "GET":
+        return render_template("dish_add.html")
+
+    form = request.form.to_dict()
+    new_dish_name = form["new_dish_name"]
+    DishName.create(name=new_dish_name)
+    return redirect(f"/dish/{new_dish_name}/edit")
+
+
 @app.route("/dish/<dish_name>/edit", methods=["GET"])
 @error_catcher
 @login_required
@@ -136,17 +149,16 @@ def dish_edit_post(dish_name):
     return redirect(f"/dish/{dish.name}/edit")
 
 
-@app.route("/dish/add", methods=["GET", "POST"])
+@app.route("/ingredients/edit", methods=["GET", "POST"])
 @error_catcher
 @login_required
-def dish_add():
+def ingr_edit():
     if request.method == "GET":
-        return render_template("dish_add.html")
+        return render_template("ingr_edit.html", ingrs=Ingredient.select(), where_to_buy=confg.places_where_to_buy)
 
     form = request.form.to_dict()
-    new_dish_name = form["new_dish_name"]
-    DishName.create(name=new_dish_name)
-    return redirect(f"/dish/{new_dish_name}/edit")
+    change_ingr(form)
+    return redirect("/ingredients/edit")
 
 
 if __name__ == '__main__':
